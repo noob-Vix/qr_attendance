@@ -2,13 +2,11 @@
 <?php
 require_once 'config.php';
 
-// Check if user is logged in as student
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
     header("Location: index.php");
     exit();
 }
 
-// Get student information
 $stmt = $pdo->prepare("SELECT * FROM students WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $student = $stmt->fetch();
@@ -19,43 +17,64 @@ $student = $stmt->fetch();
 <head>
     <title>Student Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <style>
-        body { font-family: Arial; margin: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; }
-        .qr-container { text-align: center; margin: 20px 0; }
-        .attendance-list { margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 8px; border: 1px solid #ddd; }
-        .logout-btn { background: #f44336; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; }
-    </style>
+    <link rel="stylesheet" href="css/student_dashboard.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h2>Welcome, <?php echo htmlspecialchars($student['name']); ?></h2>
+            <h2 class="welcome-text">Welcome back, <?php echo htmlspecialchars($student['name']); ?>! 👋</h2>
             <a href="logout.php" class="logout-btn">Logout</a>
         </div>
 
+        <?php
+        // Calculate attendance statistics
+        $stmt = $pdo->prepare("SELECT 
+            COUNT(*) as total_attendance,
+            COUNT(DISTINCT DATE(date)) as days_attended,
+            MAX(date) as last_attendance
+            FROM attendance 
+            WHERE student_id = ?");
+        $stmt->execute([$student['student_id']]);
+        $stats = $stmt->fetch();
+        ?>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number"><?php echo $stats['total_attendance']; ?></div>
+                <div class="stat-label">Total Check-ins</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><?php echo $stats['days_attended']; ?></div>
+                <div class="stat-label">Days Attended</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><?php echo $stats['last_attendance'] ? date('M d', strtotime($stats['last_attendance'])) : 'N/A'; ?></div>
+                <div class="stat-label">Last Attendance</div>
+            </div>
+        </div>
+
         <div class="qr-container">
-            <h3>Your Attendance QR Code</h3>
+            <h3 class="section-title">Your Attendance QR Code</h3>
+            <p>Show this code to your teacher to mark your attendance</p>
             <div id="qrcode"></div>
         </div>
 
         <div class="attendance-list">
-            <h3>Your Attendance History</h3>
+            <h3 class="section-title">Recent Attendance History</h3>
             <table>
                 <tr>
                     <th>Date</th>
                     <th>Time</th>
+                    <th>Status</th>
                 </tr>
                 <?php
-                $stmt = $pdo->prepare("SELECT * FROM attendance WHERE student_id = ? ORDER BY date DESC, time DESC");
+                $stmt = $pdo->prepare("SELECT * FROM attendance WHERE student_id = ? ORDER BY date DESC, time DESC LIMIT 10");
                 $stmt->execute([$student['student_id']]);
                 while ($row = $stmt->fetch()) {
                     echo "<tr>";
-                    echo "<td>" . htmlspecialchars($row['date']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['time']) . "</td>";
+                    echo "<td>" . date('F d, Y', strtotime($row['date'])) . "</td>";
+                    echo "<td>" . date('h:i A', strtotime($row['time'])) . "</td>";
+                    echo "<td><span style='color: #28a745'>✓ Present</span></td>";
                     echo "</tr>";
                 }
                 ?>

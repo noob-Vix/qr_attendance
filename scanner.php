@@ -69,5 +69,6 @@
             alert('Error accessing camera.');
         });
     </script>
+    
 </body>
 </html>

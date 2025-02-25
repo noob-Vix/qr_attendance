@@ -1,4 +1,3 @@
-<!-- login_process.php -->
 <?php
 require_once 'config.php';
 
@@ -20,29 +19,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: student_dashboard.php");
             exit();
         } else {
-            $_SESSION['error'] = "Invalid student ID or password";
+            $_SESSION['error'] = "Invalid student ID or password. Please check your credentials and try again.";
             header("Location: index.php");
             exit();
         }
     } 
-    else if ($type === 'admin') {
-        $username = $_POST['username'];
+    else if ($type === 'teacher') {
+        $teacher_id = $_POST['teacher_id'];
         $password = $_POST['password'];
         
-        $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
-        $stmt->execute([$username]);
-        $admin = $stmt->fetch();
+        $stmt = $pdo->prepare("SELECT * FROM teachers WHERE teacher_id = ?");
+        $stmt->execute([$teacher_id]);
+        $teacher = $stmt->fetch();
         
-        if ($admin && password_verify($password, $admin['password'])) {
-            $_SESSION['user_id'] = $admin['id'];
-            $_SESSION['user_type'] = 'admin';
+        if ($teacher && password_verify($password, $teacher['password'])) {
+            $_SESSION['user_id'] = $teacher['id'];
+            $_SESSION['user_type'] = 'teacher';
+            $_SESSION['teacher_id'] = $teacher['teacher_id'];
+            $_SESSION['teacher_name'] = $teacher['name'];
             header("Location: teacher_dashboard.php");
             exit();
         } else {
-            $_SESSION['error'] = "Invalid admin credentials";
+            $_SESSION['error'] = "Invalid teacher ID or password. Please check your credentials and try again.";
             header("Location: index.php");
             exit();
         }
     }
 }
+
+// If somehow got here without proper POST data
+$_SESSION['error'] = "Invalid login attempt. Please try again.";
+header("Location: index.php");
+exit();
 ?>

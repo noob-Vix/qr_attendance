@@ -1,0 +1,118 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+}
+.container {
+    max-width: 400px;
+    margin: 40px auto;
+}
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #1a73e8;
+}
+.logo h1 {
+    margin: 0;
+    font-size: 24px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #444;
+    font-weight: 500;
+}
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+input:focus {
+    border-color: #1a73e8;
+    outline: none;
+}
+.btn {
+    background-color: #1a73e8;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+.btn:hover {
+    background-color: #1557b0;
+}
+.error {
+    color: #dc3545;
+    background-color: #ffebee;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+.success {
+    color: #28a745;
+    background-color: #e8f5e9;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    padding: 3px;
+    border-radius: 6px;
+}
+.tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s;
+    color: #666;
+}
+.tab.active {
+    background: #1a73e8;
+    color: white;
+}
+.register-links {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+.register-links a {
+    color: #1a73e8;
+    text-decoration: none;
+    margin: 0 10px;
+}
+.register-links a:hover {
+    text-decoration: underline;
+}
+.form-section {
+    display: none;
+}
+.form-section.active {
+    display: block;
+}

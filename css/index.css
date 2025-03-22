@@ -2,7 +2,13 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #0361c0;
+    background-image: url(../images/LoginBG.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    color: #333;
+    background-color: #e7e7e7;
     min-height: 100vh;
 }
 .container {

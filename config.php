@@ -1,9 +1,9 @@
 <?php
-session_start();
-$host = 'localhost';
-$dbname = 'qr_attendance';
-$username = 'root';
-$password = '';
+    session_start();
+    $host = 'localhost';
+    $dbname = 'qr_attendance';
+    $username = 'root';
+    $password = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);

@@ -26,11 +26,17 @@ require_once 'config.php';  // Add this line at the top
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" required placeholder="Choose a strong password">
+                <input type="password" name="password" required placeholder="Choose a strong password" minlength="8">
+                <small style="color: #666;">Minimum 8 characters</small>
+            </div>
+            <div class="form-group">
+                <label>Confirm Password:</label>
+                <input type="password" name="confirm_password" required minlength="8">
             </div>
             <button type="submit">Create Account</button>
         </form>
         <div id="qrcode"></div>
+        <a href="index.php" class="back-link">← Back to Login</a>
     </div>
 
     <?php

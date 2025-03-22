@@ -63,24 +63,24 @@ require_once 'config.php';
         <form method="post">
             <div class="form-group">
                 <label>Teacher ID:</label>
-                <input type="text" name="teacher_id" required pattern="T\d{4}" 
+                <input type="text" name="teacher_id" required pattern="T\d{4}" placeholder="Enter your teacher ID"
                        title="Teacher ID must start with T followed by 4 digits (e.g., T1234)">
                 <small style="color: #666;">Format: T followed by 4 digits (e.g., T1234)</small>
             </div>
             
             <div class="form-group">
                 <label>Full Name:</label>
-                <input type="text" name="name" required>
+                <input type="text" name="name" required placeholder="Enter your full name">
             </div>
             
             <div class="form-group">
                 <label>Email:</label>
-                <input type="email" name="email" required>
+                <input type="email" name="email" required placeholder="Enter your email address">
             </div>
             
             <div class="form-group">
                 <label>Password:</label>
-                <input type="password" name="password" required minlength="8">
+                <input type="password" name="password" required minlength="8" placeholder="Choose a strong password">
                 <small style="color: #666;">Minimum 8 characters</small>
             </div>
             

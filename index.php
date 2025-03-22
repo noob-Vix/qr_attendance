@@ -7,6 +7,7 @@
 </head>
 <body>
     <div class="container">
+        
         <div class="card">
             <div class="logo">
                 <h1>📱 QR Attendance System</h1>

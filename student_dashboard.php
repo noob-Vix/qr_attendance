@@ -65,16 +65,42 @@ $student = $stmt->fetch();
                 <tr>
                     <th>Date</th>
                     <th>Time</th>
+                    <th>Teacher</th>
                     <th>Status</th>
                 </tr>
                 <?php
-                $stmt = $pdo->prepare("SELECT * FROM attendance WHERE student_id = ? ORDER BY date DESC, time DESC LIMIT 10");
+               $stmt = $pdo->prepare("
+                    SELECT a.*, c.name as class_name, t.name as teacher_name
+                    FROM attendance a
+                    LEFT JOIN classes c ON a.class_id = c.id
+                    LEFT JOIN teachers t ON c.teacher_id = t.teacher_id
+                    WHERE a.student_id = ? 
+                    ORDER BY a.date DESC, a.time DESC 
+                    LIMIT 10
+                ");
                 $stmt->execute([$student['student_id']]);
                 while ($row = $stmt->fetch()) {
                     echo "<tr>";
                     echo "<td>" . date('F d, Y', strtotime($row['date'])) . "</td>";
                     echo "<td>" . date('h:i A', strtotime($row['time'])) . "</td>";
-                    echo "<td><span style='color: #28a745'>✓ Present</span></td>";
+                    echo "<td>" . htmlspecialchars($row['teacher_name']) . "</td>";
+                    
+                    $status = $row['status'] ?: 'on-time';
+                    $status_class = '';
+                    $status_text = 'Unknown';
+                    
+                    if ($status == 'on-time') {
+                        $status_class = 'on-time';
+                        $status_text = 'On Time';
+                    } elseif ($status == 'late') {
+                        $status_class = 'late';
+                        $status_text = 'Late';
+                    } elseif ($status == 'absent') {
+                        $status_class = 'absent';
+                        $status_text = 'Absent';
+                    }
+                    
+                    echo "<td><span class='status-badge $status_class'>$status_text</span></td>";
                     echo "</tr>";
                 }
                 ?>

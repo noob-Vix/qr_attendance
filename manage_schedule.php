@@ -2,27 +2,56 @@
 require_once 'config.php';
 
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
-    header("Location: index.php");
+     header("Location: index.php");
     exit();
 }
 
-// Handle schedule updates
+// Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Handle schedule deletion
+    if (isset($_POST['action']) && $_POST['action'] === 'delete') {
+        $schedule_id = $_POST['schedule_id'];
+        $class_id = $_POST['class_id'];
+        
+        try {
+            $stmt = $pdo->prepare("DELETE FROM class_schedules WHERE id = ? AND class_id = ?");
+            $stmt->execute([$schedule_id, $class_id]);
+            $message = "Schedule deleted successfully";
+        } catch(PDOException $e) {
+            $error = "Error deleting schedule: " . $e->getMessage();
+        }
+    } 
+    // Handle schedule updates
+    else if (isset($_POST['day']) && isset($_POST['start_time']) && isset($_POST['grace_period'])) {
+        $class_id = $_POST['class_id'];
+        $day = $_POST['day'];
+        $start_time = $_POST['start_time'];
+        $grace_period = $_POST['grace_period'];
+        
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO class_schedules (class_id, day_of_week, start_time, grace_period)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE start_time = ?, grace_period = ?
+            ");
+            $stmt->execute([$class_id, $day, $start_time, $grace_period, $start_time, $grace_period]);
+            $message = "Schedule updated successfully";
+        } catch(PDOException $e) {
+            $error = "Error updating schedule: " . $e->getMessage();
+        }
+    }
+}
+// Handle schedule deletion
+if (isset($_POST['action']) && $_POST['action'] === 'delete') {
+    $schedule_id = $_POST['schedule_id'];
     $class_id = $_POST['class_id'];
-    $day = $_POST['day'];
-    $start_time = $_POST['start_time'];
-    $grace_period = $_POST['grace_period'];
     
     try {
-        $stmt = $pdo->prepare("
-            INSERT INTO class_schedules (class_id, day_of_week, start_time, grace_period)
-            VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE start_time = ?, grace_period = ?
-        ");
-        $stmt->execute([$class_id, $day, $start_time, $grace_period, $start_time, $grace_period]);
-        $message = "Schedule updated successfully";
+        $stmt = $pdo->prepare("DELETE FROM class_schedules WHERE id = ? AND class_id = ?");
+        $stmt->execute([$schedule_id, $class_id]);
+        $message = "Schedule deleted successfully";
     } catch(PDOException $e) {
-        $error = "Error updating schedule: " . $e->getMessage();
+        $error = "Error deleting schedule: " . $e->getMessage();
     }
 }
 
@@ -88,6 +117,7 @@ if ($class_id) {
                         <th>Day</th>
                         <th>Start Time</th>
                         <th>Grace Period</th>
+                        <th>Actions</th>
                     </tr>
                     <?php
                     $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -96,6 +126,14 @@ if ($class_id) {
                         echo "<td>" . htmlspecialchars($days[$schedule['day_of_week'] - 1]) . "</td>";
                         echo "<td>" . htmlspecialchars(date('h:i A', strtotime($schedule['start_time']))) . "</td>";
                         echo "<td>" . htmlspecialchars($schedule['grace_period']) . " minutes</td>";
+                        echo "<td>
+                                <form method='post' style='display:inline;' onsubmit='return confirm(\"Are you sure you want to delete this schedule?\")'>
+                                    <input type='hidden' name='schedule_id' value='" . $schedule['id'] . "'>
+                                    <input type='hidden' name='class_id' value='" . $class_id . "'>
+                                    <input type='hidden' name='action' value='delete'>
+                                    <button type='submit' class='delete-btn'>Delete</button>
+                                </form>
+                              </td>";
                         echo "</tr>";
                     }
                     ?>

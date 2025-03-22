@@ -14,17 +14,27 @@
         #preview { 
             width: 100%; 
             max-width: 500px; 
-            margin: 0 auto; 
+            margin: 50px auto; 
         }
         #result {
             margin: 20px;
             padding: 10px;
             background-color: #f0f0f0;
         }
+        .back-btn {
+            background-color: #666;
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
-    <h2>Attendance Scanner</h2>
+    <div class="header">
+        <h2>Attendance Scanner</h2> <a href="teacher_dashboard.php" class="back-btn">Back to Dashboard</a>
+        
+    </div>
     <video id="preview"></video>
     <div id="result"></div>
 
@@ -54,19 +64,15 @@
         // Start camera
         Instascan.Camera.getCameras().then(function (cameras) {
             if (cameras.length > 0) {
-                // Try to use the back camera
-                if (cameras[1]) {
-                    scanner.start(cameras[1]); // Back camera
-                } else {
-                    scanner.start(cameras[0]); // Front camera if no back camera
-                }
+                // More reliable camera selection
+                scanner.start(cameras[0]); // Use first available camera
             } else {
                 console.error('No cameras found.');
-                alert('No cameras found.');
+                document.getElementById('result').innerHTML = 'Error: No cameras found.';
             }
         }).catch(function (e) {
             console.error(e);
-            alert('Error accessing camera.');
+            document.getElementById('result').innerHTML = 'Error accessing camera: ' + e;
         });
     </script>
     

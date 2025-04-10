@@ -13,9 +13,8 @@
                 <h1>📱 QR Attendance System</h1>
             </div>
 
-            <div class="tabs">
-                <div class="tab active" onclick="switchTab('student')">Student</div>
-                <div class="tab" onclick="switchTab('teacher')">Teacher</div>
+            <div class="login-header">
+                <h2>Login</h2>
             </div>
             
             <?php
@@ -30,12 +29,12 @@
             }
             ?>
 
-            <div id="studentForm" class="form-section active">
+            <div id="loginForm" class="form-section active">
                 <form method="post" action="login_process.php">
-                    <input type="hidden" name="type" value="student">
+                    <input type="hidden" name="type">
                     <div class="form-group">
-                        <label>Student ID</label>
-                        <input type="text" name="student_id" required placeholder="Enter your student ID">
+                        <label>User ID</label>
+                        <input type="text" name="userID" required placeholder="Enter your user ID">
                     </div>
                     <div class="form-group">
                         <label>Password</label>
@@ -45,20 +44,6 @@
                 </form>
             </div>
 
-            <div id="teacherForm" class="form-section">
-                <form method="post" action="login_process.php">
-                    <input type="hidden" name="type" value="teacher">
-                    <div class="form-group">
-                        <label>Teacher ID</label>
-                        <input type="text" name="teacher_id" required placeholder="Enter your teacher ID">
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" name="password" required placeholder="Enter your password">
-                    </div>
-                    <button type="submit" class="btn">Login</button>
-                </form>
-            </div>
 
             <div class="register-links">
                 <a href="register.php">Register as Student</a>
@@ -67,25 +52,5 @@
         </div>
     </div>
 
-    <script>
-    function switchTab(type) {
-        // Update tabs
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        event.target.classList.add('active');
-        
-        // Update forms
-        document.querySelectorAll('.form-section').forEach(form => {
-            form.classList.remove('active');
-        });
-        
-        if (type === 'student') {
-            document.getElementById('studentForm').classList.add('active');
-        } else {
-            document.getElementById('teacherForm').classList.add('active');
-        }
-    }
-    </script>
 </body>
 </html>

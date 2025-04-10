@@ -2,10 +2,10 @@
 require_once 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $type = $_POST['type'];
+    $userID = trim($_POST["userID"]);
     
-    if ($type === 'student') {
-        $student_id = $_POST['student_id'];
+    if (ctype_digit($userID)) {
+        $student_id = $_POST['userID'];
         $password = $_POST['password'];
         
         $stmt = $pdo->prepare("SELECT * FROM students WHERE student_id = ?");
@@ -24,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     } 
-    else if ($type === 'teacher') {
-        $teacher_id = $_POST['teacher_id'];
+    else if (strpos($userID, "T") === 0) {
+        $teacher_id = $_POST['userID'];
         $password = $_POST['password'];
         
         $stmt = $pdo->prepare("SELECT * FROM teachers WHERE teacher_id = ?");
@@ -44,6 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: index.php");
             exit();
         }
+    }
+    else {
+        $_SESSION['error'] = "Invalid teacher ID or password. Please check your credentials and try again.";
+        header("Location: index.php");
+        exit();
     }
 }
 

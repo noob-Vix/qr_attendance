@@ -1,33 +1,59 @@
 <?php
 require_once 'config.php';
 
-// Process status update if submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
-    $attendance_id = $_POST['attendance_id'];
-    $new_status = $_POST['new_status'];
-    
-    $update_stmt = $pdo->prepare("
-        UPDATE attendance 
-        SET status = ? 
-        WHERE id = ?
-    ");
-    $update_stmt->execute([$new_status, $attendance_id]);
-}
-
 // Check if user is logged in as teacher
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
     header("Location: index.php");
     exit();
 }
 
-// Get teacher's classes
 $teacher_id = $_SESSION['teacher_id'];
-$classes_stmt = $pdo->prepare("SELECT * FROM classes WHERE teacher_id = ?");
+
+// Process status update if submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+    $attendance_id = $_POST['attendance_id'];
+    $new_status = $_POST['new_status'];
+    
+    // Verify teacher has permission to update this attendance record
+    $verify_stmt = $pdo->prepare("
+        SELECT a.id 
+        FROM attendance a
+        JOIN classes c ON a.class_id = c.id
+        WHERE a.id = ? AND c.teacher_id = ?
+    ");
+    $verify_stmt->execute([$attendance_id, $teacher_id]);
+    
+    if ($verify_stmt->rowCount() > 0) {
+        $update_stmt = $pdo->prepare("
+            UPDATE attendance 
+            SET status = ? 
+            WHERE id = ?
+        ");
+        $update_stmt->execute([$new_status, $attendance_id]);
+        $_SESSION['success'] = "Attendance status updated successfully";
+    } else {
+        $_SESSION['error'] = "You don't have permission to modify this attendance record";
+    }
+}
+
+// Get teacher's classes
+$classes_stmt = $pdo->prepare("SELECT * FROM classes WHERE teacher_id = ? ORDER BY name");
 $classes_stmt->execute([$teacher_id]);
 $classes = $classes_stmt->fetchAll();
 
 // Get selected class (if any)
 $selected_class = isset($_GET['class_id']) ? $_GET['class_id'] : null;
+
+// Verify the selected class belongs to this teacher
+if ($selected_class) {
+    $verify_class = $pdo->prepare("SELECT id FROM classes WHERE id = ? AND teacher_id = ?");
+    $verify_class->execute([$selected_class, $teacher_id]);
+    if ($verify_class->rowCount() === 0) {
+        // Class doesn't belong to this teacher
+        $_SESSION['error'] = "You don't have permission to view this class";
+        $selected_class = null;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -53,6 +79,21 @@ $selected_class = isset($_GET['class_id']) ? $_GET['class_id'] : null;
         .status-badge.on-time { background-color: #d4edda; color: #155724; }
         .status-badge.late { background-color: #fff3cd; color: #856404; }
         .status-badge.absent { background-color: #f8d7da; color: #721c24; }
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
     </style>
 </head>
 <body>
@@ -62,21 +103,37 @@ $selected_class = isset($_GET['class_id']) ? $_GET['class_id'] : null;
             <a href="logout.php" class="logout-btn">Logout</a>
         </div>
 
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="message error"><?= htmlspecialchars($_SESSION['error']) ?></div>
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+        
+        <?php if (isset($_SESSION['success'])): ?>
+            <div class="message success"><?= htmlspecialchars($_SESSION['success']) ?></div>
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
         <div class="nav-links">
             <a href="scanner.php">Open Scanner</a>
             <a href="manage_classes.php">Manage Classes</a>
             <a href="manage_schedule.php<?php echo $selected_class ? '?class_id=' . htmlspecialchars($selected_class) : ''; ?>">Manage Schedule</a>
         </div>
 
-        <select class="class-select" onchange="window.location.href='?class_id=' + this.value">
-            <option value="">Select a class</option>
-            <?php foreach ($classes as $class): ?>
-                <option value="<?= htmlspecialchars($class['id']) ?>" 
-                    <?= $selected_class == $class['id'] ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($class['name']) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+        <?php if (count($classes) === 0): ?>
+            <div class="message">
+                You haven't created any classes yet. Please <a href="manage_classes.php">create a class</a> first.
+            </div>
+        <?php else: ?>
+            <select class="class-select" onchange="window.location.href='?class_id=' + this.value">
+                <option value="">Select a class</option>
+                <?php foreach ($classes as $class): ?>
+                    <option value="<?= htmlspecialchars($class['id']) ?>" 
+                        <?= $selected_class == $class['id'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($class['name']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
 
         <?php if ($selected_class): ?>
             <?php
@@ -85,7 +142,7 @@ $selected_class = isset($_GET['class_id']) ? $_GET['class_id'] : null;
             $total_students->execute([$selected_class]);
             $student_count = $total_students->fetchColumn();
 
-            // Modified to check attendance.class_id
+            // Check attendance.class_id
             $present_today = $pdo->prepare("
                 SELECT COUNT(DISTINCT a.student_id) 
                 FROM attendance a 
@@ -139,7 +196,7 @@ $selected_class = isset($_GET['class_id']) ? $_GET['class_id'] : null;
                     ORDER BY s.name
                 ");
                 $stmt->execute([$selected_class]);
-                
+               
                 while ($row = $stmt->fetch()) {
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars($row['student_id']) . "</td>";

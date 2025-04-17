@@ -1,4 +1,4 @@
-<!-- index.php -->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,6 +9,7 @@
     <meta http-equiv="expires" content="0" />
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
+    
 </head>
 <body>
     <div class="container">
@@ -49,10 +50,10 @@
                 </form>
             </div>
 
-
             <div class="register-links">
-                <a href="register.php">Register as Student</a>
-                <a href="teacher_register.php">Register as Teacher</a>
+                <h6>Don't have an account?</h6>
+                <a href="register.php">Register</a>
+                
             </div>
         </div>
     </div>

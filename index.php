@@ -53,7 +53,8 @@
             <div class="register-links">
                 <h6>Don't have an account?</h6>
                 <a href="register.php">Register</a>
-                
+                <span class="separator">|</span>
+                <a href="forgot_password.php">Forgot Password?</a>
             </div>
         </div>
     </div>

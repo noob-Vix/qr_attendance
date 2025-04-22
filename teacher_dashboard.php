@@ -8,6 +8,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
 }
 
 $teacher_id = $_SESSION['teacher_id'];
+$teacher_name = $_SESSION['teacher_name'];
 
 // Process status update if submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
@@ -54,6 +55,11 @@ if ($selected_class) {
         $selected_class = null;
     }
 }
+
+// Get teacher's email
+$email_stmt = $pdo->prepare("SELECT email FROM teachers WHERE teacher_id = ?");
+$email_stmt->execute([$teacher_id]);
+$teacher_email = $email_stmt->fetchColumn();
 ?>
 
 <!DOCTYPE html>
@@ -62,38 +68,7 @@ if ($selected_class) {
     <title>Teacher Dashboard</title>
     <link rel="stylesheet" href="css/teacher_dashboard.css">
     <style>
-        .status-select {
-            padding: 5px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-        .status-ontime { color: #28a745; }
-        .status-late { color: #ffc107; }
-        .status-absent { color: #dc3545; }
-        td form { margin: 0; }
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-        .status-badge.on-time { background-color: #d4edda; color: #155724; }
-        .status-badge.late { background-color: #fff3cd; color: #856404; }
-        .status-badge.absent { background-color: #f8d7da; color: #721c24; }
-        .message {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-        .error {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-        .success {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
+       
     </style>
 </head>
 <body>
@@ -101,6 +76,22 @@ if ($selected_class) {
         <div class="header">
             <h2>Teacher Dashboard</h2>
             <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
+
+        <div class="user-profile">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <?php echo strtoupper(substr($teacher_name, 0, 1)); ?>
+                </div>
+                <div class="user-details">
+                    <h3>Welcome, <?php echo htmlspecialchars($teacher_name); ?></h3>
+                    <p><?php echo htmlspecialchars($teacher_id); ?> | <?php echo htmlspecialchars($teacher_email); ?></p>
+                </div>
+            </div>
+            <div class="profile-actions">
+                <a href="#" onclick="openModal('passwordModal')">Change Password</a>
+                <a href="#" onclick="openModal('emailModal')">Update Email</a>
+            </div>
         </div>
 
         <?php if (isset($_SESSION['error'])): ?>
@@ -225,5 +216,68 @@ if ($selected_class) {
         </div>
     <?php endif; ?>
     </div>
+
+    <!-- Password Change Modal -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('passwordModal')">&times;</span>
+            <h3>Change Password</h3>
+            <form action="update_password.php" method="POST">
+                <div class="form-group">
+                    <label for="current_password">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password">New Password</label>
+                    <input type="password" id="new_password" name="new_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm New Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+                <button type="submit">Update Password</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Email Update Modal -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('emailModal')">&times;</span>
+            <h3>Update Email Address</h3>
+            <form action="update_email.php" method="POST">
+                <div class="form-group">
+                    <label for="current_email">Current Email</label>
+                    <input type="email" id="current_email" name="current_email" value="<?php echo htmlspecialchars($teacher_email); ?>" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="new_email">New Email</label>
+                    <input type="email" id="new_email" name="new_email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password (to confirm)</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Update Email</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+        
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>

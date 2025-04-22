@@ -18,6 +18,10 @@ try {
         password VARCHAR(255) NOT NULL,
         qr_code TEXT NOT NULL
     )");
+
+    // Add reset token columns to students table
+    $pdo->exec("ALTER TABLE students ADD COLUMN IF NOT EXISTS reset_token VARCHAR(64) NULL");
+    $pdo->exec("ALTER TABLE students ADD COLUMN IF NOT EXISTS reset_token_expiry DATETIME NULL");
     
     // Create admins table if not exists
     $pdo->exec("CREATE TABLE IF NOT EXISTS admins (
@@ -34,6 +38,10 @@ try {
         email VARCHAR(100) NOT NULL,
         password VARCHAR(255) NOT NULL
     )");
+
+    // Add reset token columns to teachers table
+    $pdo->exec("ALTER TABLE teachers ADD COLUMN IF NOT EXISTS reset_token VARCHAR(64) NULL");
+    $pdo->exec("ALTER TABLE teachers ADD COLUMN IF NOT EXISTS reset_token_expiry DATETIME NULL");
 
     // Create classes table if not exists
     $pdo->exec("CREATE TABLE IF NOT EXISTS classes (
@@ -82,6 +90,8 @@ try {
         $admin_password = password_hash('admin123', PASSWORD_DEFAULT);
         $pdo->exec("INSERT INTO admins (username, password) VALUES ('admin', '$admin_password')");
     }
+    //for resetting passwords
+    
 } catch(PDOException $e) {
     die("Connection failed: " . $e->getMessage());
 }

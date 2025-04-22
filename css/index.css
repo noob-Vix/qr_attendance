@@ -122,3 +122,7 @@ input:focus {
 .form-section.active {
     display: block;
 }
+.separator {
+    margin: 0 8px;
+    color: #888;
+}

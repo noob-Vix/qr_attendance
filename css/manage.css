@@ -77,3 +77,88 @@ th, td {
     border-radius: 4px;
     margin-bottom: 10px;
 }
+
+.class-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+.delete-class-btn { 
+    background-color: #dc3545; 
+    color: white; 
+    border: none; 
+    padding: 5px 10px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+}
+.delete-class-btn:hover { 
+    background-color: #bd2130;
+ }
+.no-students { 
+    font-style: italic; 
+    color: #666; 
+    margin: 10px 0; 
+}
+.info-banner { 
+    background-color: #cce5ff; 
+    border: 1px solid #b8daff; 
+    color: #004085; 
+    padding: 10px; 
+    margin-bottom: 20px; 
+    border-radius: 4px; 
+}
+.controls-container { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 20px;
+ }
+.import-export-container { 
+    margin-top: 15px; 
+    padding: 15px; 
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef; 
+    border-radius: 4px; 
+    }
+.collapsible { 
+    background-color: #f1f1f1; 
+    color: #444; 
+    cursor: pointer; 
+    padding: 10px; 
+    width: 100%; 
+    border: none; 
+    text-align: left; 
+    outline: none; 
+    font-weight: bold; 
+}
+.active-collapsible, .collapsible:hover { 
+    background-color: #e0e0e0; 
+}
+.content { 
+    padding: 0 10px; 
+    max-height: 0; 
+    overflow: hidden; 
+    transition: max-height 0.2s ease-out; 
+    background-color: #f8f9fa; 
+}
+.error-list { 
+    color: #721c24; 
+    background-color: #f8d7da; 
+    border: 1px solid #f5c6cb; 
+    padding: 10px; margin-top: 10px; 
+    border-radius: 4px; max-height: 200px; 
+    overflow-y: auto; 
+}
+.excel-status { 
+    background-color: #ffc107; 
+    color: #856404; 
+    padding: 10px; 
+    margin-bottom: 15px; 
+    border-radius: 4px; 
+}
+.teacher-name { 
+    font-size: 1.1em; 
+    margin-bottom: 15px; 
+    color: #495057; 
+    background-color: #e9ecef; 
+    padding: 8px; 
+    border-radius: 4px; }
